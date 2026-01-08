@@ -20,7 +20,7 @@ dependencies = [
     "matplotlib",
     "numpy",
     "pyyaml",
-    "progressbar",
+    "progressbar2",
     "tqdm",
     "ftfy",
     "unidecode",

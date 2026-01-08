@@ -117,14 +117,13 @@ def load_vasr_model(ckpt_path, device="cuda"):
             # Skip int64 tensors (indices, counters) - only look for actual weights
             model_dtype = torch.float32  # default
             for key, tensor in state_dict.items():
-                if tensor.dtype in (torch.float32, torch.float16, torch.bfloat16,
-                                    torch.float8_e4m3fn, torch.float8_e5m2):
+                if tensor.dtype.is_floating_point:
                     model_dtype = tensor.dtype
                     print(f"[AudioSR] Detected dtype {model_dtype} from parameter '{key}'")
                     break
 
-            # For FP8, we need to handle specially since model params don't support FP8 directly
             # Convert FP8 tensors to FP16 for model compatibility
+            # PyTorch doesn't natively support FP8 as model dtype
             if model_dtype == torch.float8_e4m3fn or model_dtype == torch.float8_e5m2:
                 print(f"[AudioSR] Converting FP8 weights to FP16 for model compatibility")
                 state_dict = {k: v.to(torch.float16) for k, v in state_dict.items()}
@@ -141,7 +140,7 @@ def load_vasr_model(ckpt_path, device="cuda"):
             )
     else:
         # Load PyTorch format (.bin, .pth, .ckpt)
-        checkpoint = torch.load(ckpt_path, map_location='cpu', weights_only=False)
+        checkpoint = torch.load(ckpt_path, map_location='cpu', weights_only=True)
         state_dict = checkpoint.get("state_dict", checkpoint)
 
     latent_diffusion.load_state_dict(state_dict, strict=False)
@@ -378,8 +377,8 @@ class VASRNode:
         guidance_scale: float,
         seed: int,
         model: str = "basic (download required)",
-        chunk_size: float = 5.12,
-        overlap: float = 0.04,
+        chunk_size: float = 15.0,
+        overlap: float = 0.0,
         unload_model: bool = False,
         show_spectrogram: bool = True,
         attention_backend: str = "sdpa"
@@ -534,7 +533,7 @@ class VASRNode:
                         # Prepare batch for single chunk
                         batch, _ = make_batch_for_super_resolution(
                             None,
-                            waveform=torch.from_numpy(channel).unsqueeze(0).numpy()
+                            waveform=np.expand_dims(channel, 0)
                         )
 
                         output_waveform = _model_cache.generate_batch(
@@ -590,7 +589,7 @@ class VASRNode:
                             chunk_duration = (orig_end - orig_start) / sr
                             batch, _ = make_batch_for_super_resolution(
                                 None,
-                                waveform=torch.from_numpy(chunk).unsqueeze(0).numpy()
+                                waveform=np.expand_dims(chunk, 0)
                             )
 
                             output_chunk = _model_cache.generate_batch(
@@ -650,9 +649,10 @@ class VASRNode:
                             current_chunk += 1
                             update_progress(current_chunk, total_chunks)
 
-                        # Normalize by weight sum
+                        # Normalize by weight sum (safely handle division by zero)
                         weight_sum[weight_sum == 0] = 1.0
-                        processed_channels.append(torch.from_numpy(reconstructed / weight_sum).unsqueeze(0))
+                        reconstructed = reconstructed / weight_sum
+                        processed_channels.append(torch.from_numpy(reconstructed).unsqueeze(0))
 
                 # Combine channels
                 if is_stereo:
