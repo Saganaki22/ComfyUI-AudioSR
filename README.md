@@ -303,7 +303,7 @@ Overlap duration in seconds between chunks.
 **Symptom**: "Model not found. Please download the AudioSR model..."
 
 **Solution**:
-1. Download model from: https://huggingface.co/datasets/drbaph/AudioSR/tree/main/AudioSR
+1. Download model from: https://huggingface.co/drbaph/AudioSR/tree/main/AudioSR
 2. Place in `ComfyUI/models/AudioSR/`
 3. Restart ComfyUI
 
