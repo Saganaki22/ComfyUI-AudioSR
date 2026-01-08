@@ -1,0 +1,38 @@
+# ComfyUI-VASR Requirements
+# Audio Super Resolution custom node for ComfyUI
+
+# Core VASR dependencies (versatile_audio_super_resolution is a local module)
+torch>=2.0.0
+torchaudio>=2.0.0
+torchvision>=0.15.0
+
+# Audio processing
+soundfile
+librosa>=0.9.2
+scipy
+torchlibrosa>=0.0.9
+
+# ML/Diffusion
+transformers>=4.30.0
+huggingface_hub
+einops
+timm
+safetensors
+
+# Visualization
+matplotlib
+
+# Utilities
+numpy
+pyyaml
+progressbar
+tqdm
+ftfy
+
+# Text processing
+unidecode
+phonemizer
+chardet
+
+# Optional (gradio for standalone VASR CLI, not needed for ComfyUI)
+# gradio

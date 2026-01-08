@@ -1,0 +1,39 @@
+[project]
+name = "ComfyUI-AudioSR"
+description = "ComfyUI node for AudioSR - Versatile Audio Super Resolution upscales audio to 48kHz using latent diffusion"
+version = "1.0.0"
+license = {file = "LICENSE"}
+
+dependencies = [
+    "torch>=2.0.0",
+    "torchaudio>=2.0.0",
+    "torchvision>=0.15.0",
+    "soundfile",
+    "librosa>=0.9.2",
+    "scipy",
+    "torchlibrosa>=0.0.9",
+    "transformers>=4.30.0",
+    "huggingface_hub",
+    "einops",
+    "timm",
+    "safetensors",
+    "matplotlib",
+    "numpy",
+    "pyyaml",
+    "progressbar",
+    "tqdm",
+    "ftfy",
+    "unidecode",
+    "phonemizer",
+    "chardet",
+]
+
+[project.urls]
+Repository = "https://github.com/Saganaki22/ComfyUI-AudioSR"
+
+# Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = "saganaki22"
+DisplayName = "AudioSR"
+Icon = "https://avatars.githubusercontent.com/u/84208527"
