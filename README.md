@@ -44,11 +44,14 @@ All Python dependencies are installed automatically. No external tools required.
 
 ---
 
+<img width="1605" height="913" alt="image" src="https://github.com/user-attachments/assets/c84d723b-bfde-4998-926b-0bc38bea4b26" />
+
+<br>
+
 <img width="1200" height="800" alt="ComfyUI_temp_bildo_00002_" src="https://github.com/user-attachments/assets/786f3b0a-706c-4852-b8c0-1ab5786806ce" />
 
 ## Audio Examples
 
-## Audio Examples
 
 | Original | AudioSR |
 |----------|----------|
