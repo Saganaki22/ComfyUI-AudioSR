@@ -44,6 +44,11 @@ All Python dependencies are installed automatically. No external tools required.
 
 ---
 
+<img width="1200" height="800" alt="ComfyUI_temp_bildo_00002_" src="https://github.com/user-attachments/assets/786f3b0a-706c-4852-b8c0-1ab5786806ce" />
+
+
+---
+
 ## 📦 Installation
 
 ### Method 1: ComfyUI Manager (Recommended)
