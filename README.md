@@ -77,16 +77,16 @@ That's it! All dependencies are installed automatically.
 **Standard Python:**
 ```bash
 cd ComfyUI/custom_nodes
-git clone https://github.com/Saganaki22/ComfyUI-VASR
-cd ComfyUI-VASR
+git clone https://github.com/Saganaki22/ComfyUI-AudioSR.git
+cd ComfyUI-AudioSR
 pip install -r requirements.txt
 ```
 
 **ComfyUI Portable (Windows with embedded Python):**
 ```bash
 cd ComfyUI/custom_nodes
-git clone https://github.com/Saganaki22/ComfyUI-VASR
-cd ComfyUI-VASR
+git clone https://github.com/Saganaki22/ComfyUI-AudioSR
+cd ComfyUI-AudioSR
 ..\python_embeded\python.exe -s -m pip install -r requirements.txt
 ```
 
