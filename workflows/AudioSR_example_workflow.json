@@ -42,6 +42,8 @@
         }
       ],
       "properties": {
+        "cnr_id": "ComfyUI-AudioSR",
+        "ver": "29df4a5be9d96a8597cb98255e3ed6c2847f92d7",
         "Node name for S&R": "AudioSR",
         "ue_properties": {
           "widget_ue_connectable": {},
@@ -63,29 +65,6 @@
       ]
     },
     {
-      "id": 8,
-      "type": "MarkdownNote",
-      "pos": [
-        -3142.177932975911,
-        6999.496659014705
-      ],
-      "size": [
-        405.3729182852294,
-        705.5237728270567
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "properties": {},
-      "widgets_values": [
-        "# AudioSR - Quick Setup Guide\n\n## 📁 Model Folder Structure\n\nCreate this folder in your ComfyUI installation:\n\n```\nComfyUI/\n└── models/\n    └── AudioSR/\n        ├── audiosr_basic_fp32.safetensors\n        └── audiosr_speech_fp32.safetensors\n```\n\n## 📥 Download Models\n\n| Model | Download Link | Best For |\n|-------|---------------|----------|\n| Basic | [audiosr_basic_fp32.safetensors](https://huggingface.co/datasets/drbaph/AudioSR/resolve/main/AudioSR/audiosr_basic_fp32.safetensors) | Music, sound effects, general audio |\n| Speech | [audiosr_speech_fp32.safetensors](https://huggingface.co/datasets/drbaph/AudioSR/resolve/main/AudioSR/audiosr_speech_fp32.safetensors) | Voice, vocals, speech |\n\n**[→ View all models on HuggingFace](https://huggingface.co/datasets/drbaph/AudioSR/tree/main/AudioSR)**\n\n## 🎚️ Simple Workflow\n\n```\nLoad Audio → AudioSR → Preview Audio / Save Audio\n```\n\n## ⚙️ Recommended Settings\n\n| Setting | Value | Description |\n|---------|-------|-------------|\n| Steps | `50` | Quality vs speed (50 = good, 100 = best) |\n| Guidance | `3.5` | How faithful to input (3-5 is good range) |\n| Model | `speech` or `basic` | Choose based on your audio type |\n\n## 💻 Requirements\n\n- **GPU:** 6GB+ VRAM (8GB+ recommended)\n- **RAM:** 12GB+ recommended\n\n## 🔗 Links\n\n- [GitHub Repository](https://github.com/Saganaki22/ComfyUI-AudioSR)\n- [Models on HuggingFace](https://huggingface.co/datasets/drbaph/AudioSR/tree/main/AudioSR)\n- [Original Paper](https://arxiv.org/abs/2309.07314)\n"
-      ],
-      "color": "#c09430",
-      "bgcolor": "rgba(24,24,27,.9)"
-    },
-    {
       "id": 3,
       "type": "LoadAudio",
       "pos": [
@@ -97,7 +76,7 @@
         136
       ],
       "flags": {},
-      "order": 1,
+      "order": 0,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -192,6 +171,35 @@
         }
       },
       "widgets_values": []
+    },
+    {
+      "id": 8,
+      "type": "MarkdownNote",
+      "pos": [
+        -3142.177932975911,
+        6999.496659014705
+      ],
+      "size": [
+        405.3729182852294,
+        705.5237728270567
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.5.2",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "# AudioSR - Quick Setup Guide\n\n## 📁 Model Folder Structure\n\nCreate this folder in your ComfyUI installation:\n\n```\nComfyUI/\n└── models/\n    └── AudioSR/\n        ├── audiosr_basic_fp32.safetensors\n        └── audiosr_speech_fp32.safetensors\n```\n\n## 📥 Download Models\n\n| Model | Download Link | Best For |\n|-------|---------------|----------|\n| Basic | [audiosr_basic_fp32.safetensors](https://huggingface.co/datasets/drbaph/AudioSR/resolve/main/AudioSR/audiosr_basic_fp32.safetensors) | Music, sound effects, general audio |\n| Speech | [audiosr_speech_fp32.safetensors](https://huggingface.co/datasets/drbaph/AudioSR/resolve/main/AudioSR/audiosr_speech_fp32.safetensors) | Voice, vocals, speech |\n\n**[→ View all models on HuggingFace](https://huggingface.co/drbaph/AudioSR/tree/main/AudioSR)**\n\n## 🎚️ Simple Workflow\n\n```\nLoad Audio → AudioSR → Preview Audio / Save Audio\n```\n\n## ⚙️ Recommended Settings\n\n| Setting | Value | Description |\n|---------|-------|-------------|\n| Steps | `50` | Quality vs speed (50 = good, 100 = best) |\n| Guidance | `3.5` | How faithful to input (3-5 is good range) |\n| Model | `speech` or `basic` | Choose based on your audio type |\n\n## 💻 Requirements\n\n- **GPU:** 6GB+ VRAM (8GB+ recommended)\n- **RAM:** 12GB+ recommended\n\n## 🔗 Links\n\n- [GitHub Repository](https://github.com/Saganaki22/ComfyUI-AudioSR)\n- [Models on HuggingFace](https://huggingface.co/datasets/drbaph/AudioSR/tree/main/AudioSR)\n- [Original Paper](https://arxiv.org/abs/2309.07314)\n"
+      ],
+      "color": "#c09430",
+      "bgcolor": "rgba(24,24,27,.9)"
     }
   ],
   "links": [
@@ -226,10 +234,10 @@
     "workflowRendererVersion": "LG",
     "ue_links": [],
     "ds": {
-      "scale": 0.7627768444385532,
+      "scale": 0.8390545288824087,
       "offset": [
-        3793.2663427167518,
-        -6543.159339310823
+        3724.451760810282,
+        -6543.389858076305
       ]
     },
     "links_added_by_ue": [],
