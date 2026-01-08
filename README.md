@@ -95,7 +95,7 @@ cd ComfyUI-AudioSR
 **Important:** Models must be placed in `ComfyUI/models/AudioSR/`
 
 **Download from HuggingFace:**
-https://huggingface.co/datasets/drbaph/AudioSR/tree/main/AudioSR
+https://huggingface.co/drbaph/AudioSR/tree/main/AudioSR
 
 Download one or both models and place them in your ComfyUI models directory:
 
