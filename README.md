@@ -419,12 +419,12 @@ The spectrogram uses the **magma** colormap:
 
 ## 📝 Changelog
 
-### Version 1.0.0
+### Version 1.0.1
 
 - ✅ Native ComfyUI AUDIO type support
 - ✅ Automatic sample rate conversion (any input rate → 48kHz)
 - ✅ Stereo audio processing
-- ✅ Long audio support with smart chunking
+- ✅ Longer audio support with smart chunking
 - ✅ Before/after spectrogram visualization
 - ✅ Progress reporting and interrupt support
 - ✅ Model caching and optional VRAM unloading
