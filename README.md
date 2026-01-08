@@ -46,6 +46,15 @@ All Python dependencies are installed automatically. No external tools required.
 
 <img width="1200" height="800" alt="ComfyUI_temp_bildo_00002_" src="https://github.com/user-attachments/assets/786f3b0a-706c-4852-b8c0-1ab5786806ce" />
 
+## Audio Examples
+
+## Audio Examples
+
+| Original | AudioSR |
+|----------|----------|
+| [speech_up_4.wav](https://huggingface.co/drbaph/AudioSR/resolve/main/samples/speech_up_4.wav) | [speech_audiosr_4.wav](https://huggingface.co/drbaph/AudioSR/resolve/main/samples/speech_audiosr_4.wav) |
+| [event_up_2.wav](https://huggingface.co/drbaph/AudioSR/resolve/main/samples/event_up_2.wav) | [event_audiosr_2.wav](https://huggingface.co/drbaph/AudioSR/resolve/main/samples/event_audiosr_2.wav) |
+
 
 ---
 
