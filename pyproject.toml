@@ -1,7 +1,7 @@
 [project]
 name = "ComfyUI-AudioSR"
 description = "ComfyUI node for AudioSR - Versatile Audio Super Resolution upscales audio to 48kHz using latent diffusion"
-version = "1.0.2"
+version = "1.0.3"
 license = {file = "LICENSE"}
 
 dependencies = [
