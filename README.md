@@ -388,7 +388,7 @@ The spectrogram uses the **magma** colormap:
 - [AudioSR Paper (arXiv)](https://arxiv.org/abs/2309.07314)
 - [Project Page](https://audioldm.github.io/audiosr/)
 - [Original Repository](https://github.com/haoheliu/versatile_audio_super_resolution)
-- [Models (HuggingFace)](https://huggingface.co/datasets/drbaph/AudioSR/tree/main/AudioSR)
+- [Models (HuggingFace)](https://huggingface.co/drbaph/AudioSR/tree/main/AudioSR)
 - [ComfyUI](https://github.com/comfyanonymous/ComfyUI)
 
 ---
