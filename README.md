@@ -505,6 +505,16 @@ The spectrogram uses the **magma** colormap:
 
 ## 📝 Changelog
 
+### Version 1.0.5
+
+- ✅ Model directory and file scanning now cached (no repeated folder scans on browser refresh/reload)
+- ✅ Removed verbose console messages on tab refresh ("Checking path", "Found model", etc.)
+- ✅ Improved startup performance by avoiding redundant file system operations
+
+### Version 1.0.4
+
+- ✅ Minor fixes and improvements
+
 ### Version 1.0.3
 
 - ✅ Added `use_torch_compile` toggle for 20-30% speed boost (FP32 models)
