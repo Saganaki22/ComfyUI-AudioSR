@@ -11,6 +11,7 @@ import random
 import tempfile
 import gc
 import threading
+import hashlib
 from pathlib import Path
 
 import torch
@@ -78,23 +79,30 @@ _model_path = None
 _model_use_compile = None
 _model_cache_lock = threading.Lock()
 
+# Cache for model directory and model files to avoid repeated scanning
+_model_dir_cache = None
+_model_files_cache = None
+
 
 def get_vasr_model_path():
     """Get the AudioSR models directory path."""
+    global _model_dir_cache
+    if _model_dir_cache is not None:
+        return _model_dir_cache
+
     if HAS_FOLDER_PATHS:
         # Fallback: use models directory with AudioSR subfolder
         try:
             models_dir = folder_paths.models_dir
             audio_sr_path = str(Path(models_dir) / "AudioSR")
-            print(f"[AudioSR] Checking path: {audio_sr_path}")
+            _model_dir_cache = audio_sr_path
             return audio_sr_path
         except (AttributeError, TypeError) as e:
-            print(f"[AudioSR] folder_paths.models_dir failed: {e}")
             pass
 
     # Final fallback: relative path
     fallback_path = str(Path(__file__).parent.parent / "models" / "AudioSR")
-    print(f"[AudioSR] Using fallback path: {fallback_path}")
+    _model_dir_cache = fallback_path
     return fallback_path
 
 
@@ -297,26 +305,28 @@ class VASRNode:
 
     @classmethod
     def INPUT_TYPES(cls):
-        # Get available model files from VASR models directory
-        model_dir = get_vasr_model_path()
-        model_files = []
+        global _model_files_cache
 
-        print(f"[AudioSR] Looking for models in: {model_dir}")
-
-        if os.path.exists(model_dir):
-            print(f"[AudioSR] Model directory exists!")
-            for f in os.listdir(model_dir):
-                if f.endswith(('.bin', '.pth', '.ckpt', '.safetensors')):
-                    model_files.append(f)
-                    print(f"[AudioSR] Found model: {f}")
-            print(f"[AudioSR] Total models found: {len(model_files)}")
+        # Return cached model files if available
+        if _model_files_cache is not None:
+            model_files = _model_files_cache
         else:
-            print(f"[AudioSR] Model directory does NOT exist!")
+            # Get available model files from VASR models directory
+            model_dir = get_vasr_model_path()
+            model_files = []
 
-        # Add default option if no models found
-        if not model_files:
-            model_files = ["basic (download required)", "speech (download required)"]
-            print(f"[AudioSR] No models found, using default options")
+            if os.path.exists(model_dir):
+                for f in os.listdir(model_dir):
+                    if f.endswith(('.bin', '.pth', '.ckpt', '.safetensors')):
+                        model_files.append(f)
+            else:
+                pass  # Directory doesn't exist yet
+
+            # Add default option if no models found
+            if not model_files:
+                model_files = ["basic (download required)", "speech (download required)"]
+
+            _model_files_cache = model_files
 
         return {
             "required": {
@@ -791,10 +801,10 @@ class VASRNode:
 
     @classmethod
     def IS_CHANGED(cls, **kwargs):
-        # Force re-execution when seed or model changes
         seed = kwargs.get("seed", 0)
         model = kwargs.get("model", "")
-        return float(f"{hash(model + str(seed))}")
+        data = f"{model}_{seed}"
+        return float(int(hashlib.md5(data.encode()).hexdigest()[:8], 16))
 
 
 # Register AudioSR models directory with ComfyUI
