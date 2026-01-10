@@ -10,6 +10,7 @@ import sys
 import random
 import tempfile
 import gc
+import threading
 from pathlib import Path
 
 import torch
@@ -74,6 +75,8 @@ def update_progress(current, total, node_prefix="AudioSR"):
 _model_cache = None
 _model_device = None
 _model_path = None
+_model_use_compile = None
+_model_cache_lock = threading.Lock()
 
 
 def get_vasr_model_path():
@@ -95,7 +98,7 @@ def get_vasr_model_path():
     return fallback_path
 
 
-def load_vasr_model(ckpt_path, device="cuda"):
+def load_vasr_model(ckpt_path, device="cuda", use_torch_compile=False):
     """Load VASR model from checkpoint (supports .bin/.pth and .safetensors)."""
     # Get default config from VASR
     from versatile_audio_super_resolution.audiosr.utils import default_audioldm_config
@@ -147,6 +150,15 @@ def load_vasr_model(ckpt_path, device="cuda"):
 
     latent_diffusion.eval()
     latent_diffusion = latent_diffusion.to(device)
+
+    # Apply torch.compile if requested (faster inference after warmup)
+    if use_torch_compile:
+        print("[AudioSR] Compiling model with torch.compile() (this may take a moment)...")
+        try:
+            latent_diffusion = torch.compile(latent_diffusion, mode="reduce-overhead")
+            print("[AudioSR] torch.compile() applied successfully")
+        except Exception as e:
+            print(f"[AudioSR] torch.compile() failed: {e}, continuing without compilation")
 
     return latent_diffusion
 
@@ -361,6 +373,10 @@ class VASRNode:
                     "default": "sdpa",
                     "tooltip": "Attention computation backend: sdpa (PyTorch native, fastest & recommended), eager (einsum-based, most compatible)"
                 }),
+                "use_torch_compile": ("BOOLEAN", {
+                    "default": False,
+                    "tooltip": "Use torch.compile() to optimize model for faster inference (FP32 only - experimental)"
+                }),
             }
         }
 
@@ -381,7 +397,8 @@ class VASRNode:
         overlap: float = 0.0,
         unload_model: bool = False,
         show_spectrogram: bool = True,
-        attention_backend: str = "sdpa"
+        attention_backend: str = "sdpa",
+        use_torch_compile: bool = False
     ):
         """
         Main processing function for audio super-resolution.
@@ -393,15 +410,16 @@ class VASRNode:
             seed: Random seed (0 = random)
             model: Model checkpoint file name
             chunk_size: Chunk duration in seconds (default: 15s from main repo)
-            overlap: Overlap duration in seconds (default: 2s from main repo)
+            overlap: Overlap duration in seconds (default:2s from main repo)
             unload_model: Unload model from GPU memory after generation
             show_spectrogram: Generate before/after spectrogram comparison
             attention_backend: Attention backend to use (sdpa, eager, flash_attention, sageattn)
+            use_torch_compile: Use torch.compile() to optimize model for faster inference (FP32 only)
 
         Returns:
             tuple: (audio, spectrogram) - ComfyUI audio format at 48kHz and optional spectrogram image
         """
-        global _model_cache, _model_device, _model_path
+        global _model_cache, _model_device, _model_path, _model_use_compile
 
         # Unpack ComfyUI audio format: can be dict {'waveform': tensor, 'sample_rate': int}
         # or tuple (waveform, sample_rate) for backwards compatibility
@@ -481,20 +499,43 @@ class VASRNode:
         if not os.path.exists(ckpt_path):
             raise ValueError(f"Model file not found: {ckpt_path}")
 
-        if _model_cache is None or _model_device != device or _model_path != ckpt_path:
-            print(f"[AudioSR] Loading model '{model}' on {device}...")
-            _model_cache = load_vasr_model(ckpt_path, device)
-            _model_device = device
-            _model_path = ckpt_path
-        else:
-            print(f"[AudioSR] Using cached model on {device}")
+        with _model_cache_lock:
+            if _model_cache is None or _model_device != device or _model_path != ckpt_path:
+                print(f"[AudioSR] Loading model '{model}' on {device}...")
+                _model_cache = load_vasr_model(
+                    ckpt_path,
+                    device,
+                    use_torch_compile=use_torch_compile
+                )
+                _model_device = device
+                _model_path = ckpt_path
+                _model_use_compile = use_torch_compile
+            else:
+                # Check if compile setting changed - if so, reload model
+                if _model_use_compile != use_torch_compile:
+                    print(f"[AudioSR] torch.compile setting changed, reloading model...")
+                    if _model_cache is not None:
+                        del _model_cache
+                    _model_cache = load_vasr_model(
+                        ckpt_path,
+                        device,
+                        use_torch_compile=use_torch_compile
+                    )
+                    _model_device = device
+                    _model_path = ckpt_path
+                    _model_use_compile = use_torch_compile
+                    gc.collect()
+                    if torch.cuda.is_available():
+                        torch.cuda.empty_cache()
+                else:
+                    print(f"[AudioSR] Using cached model on {device}")
 
         # Get ComfyUI model_management for VRAM operations
         mm = model_management if HAS_COMFY else None
 
         # Set attention backend before processing
         set_attention_backend(attention_backend)
-        print(f"[AudioSR] Settings: steps={ddim_steps}, guidance={guidance_scale}, seed={seed}, attention={attention_backend}")
+        print(f"[AudioSR] Settings: steps={ddim_steps}, guidance={guidance_scale}, seed={seed}, attention={attention_backend}, compile={use_torch_compile}")
 
         # Wrap processing in interrupt exception handler
         try:
@@ -620,7 +661,7 @@ class VASRNode:
                             if overlap > 0 and i < len(chunks) - 1:
                                 fade_len = min(output_overlap_samples, orig_output_len)
                                 fade_out = np.linspace(1., 0., fade_len)
-                                output_chunk_np[:fade_len] *= fade_out
+                                output_chunk_np[-fade_len:] *= fade_out
 
                             if overlap > 0 and i > 0:
                                 fade_len = min(output_overlap_samples, orig_output_len)
@@ -650,8 +691,11 @@ class VASRNode:
                             update_progress(current_chunk, total_chunks)
 
                         # Normalize by weight sum (safely handle division by zero)
-                        weight_sum[weight_sum == 0] = 1.0
-                        reconstructed = reconstructed / weight_sum
+                        # Apply to entire reconstructed array to ensure consistent loudness
+                        nonzero_weights = weight_sum > 0
+                        if np.any(nonzero_weights):
+                            reconstructed[nonzero_weights] /= weight_sum[nonzero_weights]
+
                         processed_channels.append(torch.from_numpy(reconstructed).unsqueeze(0))
 
                 # Combine channels

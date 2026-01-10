@@ -71,7 +71,7 @@ def get_vocoder_config_48k():
 
 
 def get_available_checkpoint_keys(model, ckpt):
-    state_dict = torch.load(ckpt)["state_dict"]
+    state_dict = torch.load(ckpt, weights_only=True)["state_dict"]
     current_state_dict = model.state_dict()
     new_state_dict = {}
     for k in state_dict.keys():

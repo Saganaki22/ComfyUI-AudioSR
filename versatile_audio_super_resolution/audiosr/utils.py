@@ -358,10 +358,8 @@ def instantiate_from_config(config):
         raise KeyError("Expected key `target` to instantiate.")
     try:
         return get_obj_from_str(config["target"])(**config.get("params", dict()))
-    except:
-        import ipdb
-
-        ipdb.set_trace()
+    except Exception as e:
+        print(f"Error instantiating from config: {e}")
 
 
 def default_audioldm_config(model_name="basic"):
@@ -422,7 +420,10 @@ def get_basic_config():
                     "base_learning_rate": 0.000008,
                     "target": "versatile_audio_super_resolution.audiosr.latent_encoder.autoencoder.AutoencoderKL",
                     "params": {
-                        "reload_from_ckpt": "/mnt/bn/lqhaoheliu/project/audio_generation_diffusion/log/vae/vae_48k_256/ds_8_kl_1/checkpoints/ckpt-checkpoint-484999.ckpt",
+                        "reload_from_ckpt": os.path.join(
+                            os.path.dirname(os.path.abspath(__file__)),
+                            "../../../checkpoints/vae_48k_256/ds_8_kl_1/checkpoints/ckpt-checkpoint-484999.ckpt"
+                        ),
                         "sampling_rate": 48000,
                         "batchsize": 4,
                         "monitor": "val/rec_loss",

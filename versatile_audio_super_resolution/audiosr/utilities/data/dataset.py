@@ -108,7 +108,7 @@ class AudioDataset(Dataset):
         try:
             if dataset in self.metadata_root["metadata"]["path"].keys():
                 return self.metadata_root["metadata"]["path"][dataset][key]
-        except:
+        except KeyError:
             raise ValueError(
                 'Dataset %s does not metadata "%s" specified' % (dataset, key)
             )

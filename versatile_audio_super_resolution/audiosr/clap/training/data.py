@@ -493,8 +493,9 @@ def preprocess(
 
     try:
         json_dict_raw = json.loads(sample[text_ext].decode("utf-8"))
-    except:
+    except json.JSONDecodeError as e:
         print("sample[__url__]:", sample["__url__"])
+        json_dict_raw = json.loads(sample[text_ext].decode("utf-8"))
 
     # For selecting augmented text from dataset
     if text_augment_selection is None or text_augment_selection == "none":

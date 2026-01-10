@@ -90,7 +90,7 @@ class AutoencoderKL(nn.Module):
         self.logger_exp_name = exp_name
 
     def init_from_ckpt(self, path, ignore_keys=list()):
-        sd = torch.load(path, map_location="cpu")["state_dict"]
+        sd = torch.load(path, map_location="cpu", weights_only=True)["state_dict"]
         keys = list(sd.keys())
         for k in keys:
             for ik in ignore_keys:

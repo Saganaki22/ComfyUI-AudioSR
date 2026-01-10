@@ -1,115 +1,44 @@
 {
   "id": "db47042b-a9fa-496a-a80c-a8bcfba3576e",
   "revision": 0,
-  "last_node_id": 8,
-  "last_link_id": 12,
+  "last_node_id": 11,
+  "last_link_id": 24,
   "nodes": [
     {
-      "id": 7,
-      "type": "AudioSR",
+      "id": 8,
+      "type": "MarkdownNote",
       "pos": [
-        -2416.4914393948698,
-        6993.437244422703
+        -3142.177932975911,
+        6999.496659014705
       ],
       "size": [
-        326.02145127081894,
-        295.8380144354833
-      ],
-      "flags": {},
-      "order": 2,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "audio",
-          "type": "AUDIO",
-          "link": 9
-        }
-      ],
-      "outputs": [
-        {
-          "name": "audio",
-          "type": "AUDIO",
-          "links": [
-            10
-          ]
-        },
-        {
-          "name": "spectrogram",
-          "type": "IMAGE",
-          "links": [
-            12
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "ComfyUI-AudioSR",
-        "ver": "29df4a5be9d96a8597cb98255e3ed6c2847f92d7",
-        "Node name for S&R": "AudioSR",
-        "ue_properties": {
-          "widget_ue_connectable": {},
-          "input_ue_unconnectable": {},
-          "version": "7.5.2"
-        }
-      },
-      "widgets_values": [
-        60,
-        3.5,
-        136,
-        "fixed",
-        "audiosr_speech_fp32.safetensors",
-        6,
-        0,
-        true,
-        true,
-        "sdpa"
-      ]
-    },
-    {
-      "id": 3,
-      "type": "LoadAudio",
-      "pos": [
-        -2711.5484576765043,
-        6993.42215852033
-      ],
-      "size": [
-        282.798828125,
-        136
+        405.3729182852294,
+        705.5237728270567
       ],
       "flags": {},
       "order": 0,
       "mode": 0,
       "inputs": [],
-      "outputs": [
-        {
-          "name": "AUDIO",
-          "type": "AUDIO",
-          "links": [
-            9
-          ]
-        }
-      ],
+      "outputs": [],
       "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.8.0",
-        "Node name for S&R": "LoadAudio",
         "ue_properties": {
           "widget_ue_connectable": {},
-          "input_ue_unconnectable": {},
-          "version": "7.5.2"
+          "version": "7.5.2",
+          "input_ue_unconnectable": {}
         }
       },
       "widgets_values": [
-        "speech_up_2.wav",
-        null,
-        null
-      ]
+        "# AudioSR - Quick Setup Guide\n\n## 📁 Model Folder Structure\n\nCreate this folder in your ComfyUI installation:\n\n```\nComfyUI/\n└── models/\n    └── AudioSR/\n        ├── audiosr_basic_fp32.safetensors\n        └── audiosr_speech_fp32.safetensors\n```\n\n## 📥 Download Models\n\n| Model | Download Link | Best For |\n|-------|---------------|----------|\n| Basic | [audiosr_basic_fp32.safetensors](https://huggingface.co/drbaph/AudioSR/resolve/main/AudioSR/audiosr_basic_fp32.safetensors) | Music, sound effects, general audio |\n| Speech | [audiosr_speech_fp32.safetensors](https://huggingface.co/drbaph/AudioSR/resolve/main/AudioSR/audiosr_speech_fp32.safetensors) | Voice, vocals, speech |\n\n**[→ View all models on HuggingFace](https://huggingface.co/drbaph/AudioSR/tree/main/AudioSR)**\n\n## 🎚️ Simple Workflow\n\n```\nLoad Audio → AudioSR → Preview Audio / Save Audio\n```\n\n## ⚙️ Recommended Settings\n\n| Setting | Value | Description |\n|---------|-------|-------------|\n| Steps | `50` | Quality vs speed (50 = good, 100 = best) |\n| Guidance | `3.5` | How faithful to input (3-5 is good range) |\n| Model | `speech` or `basic` | Choose based on your audio type |\n\n## 💻 Requirements\n\n- **GPU:** 6GB+ VRAM (8GB+ recommended)\n- **RAM:** 12GB+ recommended\n\n## 🔗 Links\n\n- [GitHub Repository](https://github.com/Saganaki22/ComfyUI-AudioSR)\n- [Models on HuggingFace](https://huggingface.co/drbaph/AudioSR/tree/main/AudioSR)\n- [Original Paper](https://arxiv.org/abs/2309.07314)\n"
+      ],
+      "color": "#c09430",
+      "bgcolor": "rgba(24,24,27,.9)"
     },
     {
       "id": 4,
       "type": "PreviewAudio",
       "pos": [
-        -2078.7292785075124,
-        6993.3425444246395
+        -2098.0192070171515,
+        6995.717449202852
       ],
       "size": [
         314.10588130878614,
@@ -122,7 +51,7 @@
         {
           "name": "audio",
           "type": "AUDIO",
-          "link": 10
+          "link": 23
         }
       ],
       "outputs": [],
@@ -142,8 +71,8 @@
       "id": 5,
       "type": "PreviewImage",
       "pos": [
-        -2534.0321745118667,
-        7334.053926608853
+        -2556.232924344642,
+        7378.132978557605
       ],
       "size": [
         591.9823916810274,
@@ -156,7 +85,7 @@
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 12
+          "link": 24
         }
       ],
       "outputs": [],
@@ -173,55 +102,127 @@
       "widgets_values": []
     },
     {
-      "id": 8,
-      "type": "MarkdownNote",
+      "id": 3,
+      "type": "LoadAudio",
       "pos": [
-        -3142.177932975911,
-        6999.496659014705
+        -2722.2414103146166,
+        6995.468037941284
       ],
       "size": [
-        405.3729182852294,
-        705.5237728270567
+        282.798828125,
+        136
       ],
       "flags": {},
       "order": 1,
       "mode": 0,
       "inputs": [],
-      "outputs": [],
+      "outputs": [
+        {
+          "name": "AUDIO",
+          "type": "AUDIO",
+          "links": [
+            22
+          ]
+        }
+      ],
       "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.8.0",
+        "Node name for S&R": "LoadAudio",
         "ue_properties": {
           "widget_ue_connectable": {},
-          "version": "7.5.2",
-          "input_ue_unconnectable": {}
+          "input_ue_unconnectable": {},
+          "version": "7.5.2"
         }
       },
       "widgets_values": [
-        "# AudioSR - Quick Setup Guide\n\n## 📁 Model Folder Structure\n\nCreate this folder in your ComfyUI installation:\n\n```\nComfyUI/\n└── models/\n    └── AudioSR/\n        ├── audiosr_basic_fp32.safetensors\n        └── audiosr_speech_fp32.safetensors\n```\n\n## 📥 Download Models\n\n| Model | Download Link | Best For |\n|-------|---------------|----------|\n| Basic | [audiosr_basic_fp32.safetensors](https://huggingface.co/drbaph/AudioSR/resolve/main/AudioSR/audiosr_basic_fp32.safetensors) | Music, sound effects, general audio |\n| Speech | [audiosr_speech_fp32.safetensors](https://huggingface.co/drbaph/AudioSR/resolve/main/AudioSR/audiosr_speech_fp32.safetensors) | Voice, vocals, speech |\n\n**[→ View all models on HuggingFace](https://huggingface.co/drbaph/AudioSR/tree/main/AudioSR)**\n\n## 🎚️ Simple Workflow\n\n```\nLoad Audio → AudioSR → Preview Audio / Save Audio\n```\n\n## ⚙️ Recommended Settings\n\n| Setting | Value | Description |\n|---------|-------|-------------|\n| Steps | `50` | Quality vs speed (50 = good, 100 = best) |\n| Guidance | `3.5` | How faithful to input (3-5 is good range) |\n| Model | `speech` or `basic` | Choose based on your audio type |\n\n## 💻 Requirements\n\n- **GPU:** 6GB+ VRAM (8GB+ recommended)\n- **RAM:** 12GB+ recommended\n\n## 🔗 Links\n\n- [GitHub Repository](https://github.com/Saganaki22/ComfyUI-AudioSR)\n- [Models on HuggingFace](https://huggingface.co/drbaph/AudioSR/tree/main/AudioSR)\n- [Original Paper](https://arxiv.org/abs/2309.07314)\n"
+        "speech_up_4.wav",
+        null,
+        null
+      ]
+    },
+    {
+      "id": 11,
+      "type": "AudioSR",
+      "pos": [
+        -2429.7099055998156,
+        6994.819164294944
       ],
-      "color": "#c09430",
-      "bgcolor": "rgba(24,24,27,.9)"
+      "size": [
+        321.7209396060989,
+        342
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 22
+        }
+      ],
+      "outputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "links": [
+            23
+          ]
+        },
+        {
+          "name": "spectrogram",
+          "type": "IMAGE",
+          "links": [
+            24
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "ComfyUI-AudioSR",
+        "ver": "ea3414b1a184d651a1a22f2781a7adf3b49bfb83",
+        "Node name for S&R": "AudioSR",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.5.2"
+        }
+      },
+      "widgets_values": [
+        50,
+        3.5,
+        633030950,
+        "fixed",
+        "audiosr_speech_fp32.safetensors",
+        15,
+        2,
+        true,
+        true,
+        "sdpa",
+        true
+      ]
     }
   ],
   "links": [
     [
-      9,
+      22,
       3,
       0,
-      7,
+      11,
       0,
       "AUDIO"
     ],
     [
-      10,
-      7,
+      23,
+      11,
       0,
       4,
       0,
       "AUDIO"
     ],
     [
-      12,
-      7,
+      24,
+      11,
       1,
       5,
       0,
@@ -234,10 +235,10 @@
     "workflowRendererVersion": "LG",
     "ue_links": [],
     "ds": {
-      "scale": 0.8390545288824087,
+      "scale": 1.6350799082655996,
       "offset": [
-        3724.451760810282,
-        -6543.389858076305
+        3120.40818468174,
+        -6889.8084057535025
       ]
     },
     "links_added_by_ue": [],
