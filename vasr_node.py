@@ -665,25 +665,14 @@ class VASRNode:
                                 # If still multi-dimensional, flatten
                                 output_chunk_np = output_chunk_np.flatten()
 
-                            orig_output_len = output_chunk_np.shape[0]
-
-                            # Apply fade window for overlap regions
-                            if overlap > 0 and i < len(chunks) - 1:
-                                fade_len = min(output_overlap_samples, orig_output_len)
-                                fade_out = np.linspace(1., 0., fade_len)
-                                output_chunk_np[-fade_len:] *= fade_out
-
-                            if overlap > 0 and i > 0:
-                                fade_len = min(output_overlap_samples, orig_output_len)
-                                fade_in = np.linspace(0., 1., fade_len)
-                                output_chunk_np[:fade_len] *= fade_in
-
                             # Calculate output position (time-scaled)
+                            # FIX: Position based on INPUT boundaries, not model output length
                             out_start = int(orig_start / sr * 48000)
-                            out_end = min(out_start + orig_output_len, reconstructed.shape[0])
-
-                            # Truncate output_chunk if needed to match slice size
+                            expected_output_len = int((orig_end - orig_start) / sr * 48000)
+                            out_end = min(out_start + expected_output_len, reconstructed.shape[0])
                             slice_len = out_end - out_start
+
+                            # Truncate or pad to expected output length (matches input boundaries)
                             if output_chunk_np.shape[0] > slice_len:
                                 output_chunk_np = output_chunk_np[:slice_len]
                             elif output_chunk_np.shape[0] < slice_len:
@@ -692,16 +681,31 @@ class VASRNode:
                                 padded[:output_chunk_np.shape[0]] = output_chunk_np
                                 output_chunk_np = padded
 
-                            # Add to reconstructed array
+                            # Apply fade window for overlap regions BEFORE adding
+                            # This ensures proper amplitude in overlap regions
+                            chunk_weights = np.ones(slice_len)
+                            if overlap > 0 and i < len(chunks) - 1:
+                                fade_len = min(output_overlap_samples, slice_len)
+                                fade_out = np.linspace(1., 0., fade_len)
+                                output_chunk_np[-fade_len:] *= fade_out
+                                chunk_weights[-fade_len:] *= fade_out
+
+                            if overlap > 0 and i > 0:
+                                fade_len = min(output_overlap_samples, slice_len)
+                                fade_in = np.linspace(0., 1., fade_len)
+                                output_chunk_np[:fade_len] *= fade_in
+                                chunk_weights[:fade_len] *= fade_in
+
+                            # Add weighted chunk to reconstructed array
                             reconstructed[out_start:out_end] += output_chunk_np
-                            weight_sum[out_start:out_end] += 1.0
+                            weight_sum[out_start:out_end] += chunk_weights
 
                             # Report progress after each chunk
                             current_chunk += 1
                             update_progress(current_chunk, total_chunks)
 
                         # Normalize by weight sum (safely handle division by zero)
-                        # Apply to entire reconstructed array to ensure consistent loudness
+                        # Weight sum accounts for fade factors, so normalization restores proper amplitude
                         nonzero_weights = weight_sum > 0
                         if np.any(nonzero_weights):
                             reconstructed[nonzero_weights] /= weight_sum[nonzero_weights]

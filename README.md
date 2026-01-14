@@ -439,6 +439,19 @@ Enable PyTorch's torch.compile() optimization for faster inference.
 - Switching between FP32 and FP16 models
 - ComfyUI restart (model cache cleared)
 
+### Volume Drops at Chunk Boundaries
+
+**Symptom**: Periodic volume drops or glitches in long audio (every 10-30 seconds depending on chunk_size)
+
+**Causes**:
+- The model internally pads audio to 5.12s multiples, causing output length to differ from input
+- Improper chunk positioning when stitching outputs together
+
+**Solutions** (v1.0.6+):
+- This issue is now fixed automatically
+- If using older version, update to v1.0.6 or later
+- For smoothest transitions, use `overlap: 2.0-3.0` when processing long audio
+
 </details>
 
 ---
@@ -504,6 +517,12 @@ The spectrogram uses the **magma** colormap:
 ---
 
 ## 📝 Changelog
+
+### Version 1.0.6
+
+- ✅ **Fixed chunk positioning bug**: Model internally pads audio to 5.12s multiples, causing output length to differ from input. Fixed by positioning chunks based on INPUT boundaries rather than model output length. This eliminates volume drops/glitches at chunk boundaries (30s, 60s, etc.) in long audio files.
+- ✅ **Fixed overlap-add normalization**: Improved chunk stitching with proper weight tracking for overlap regions. Ensures consistent amplitude across chunk boundaries when using `overlap > 0`.
+- ✅ Improved handling of stereo audio processing with independent channel reconstruction.
 
 ### Version 1.0.5
 
