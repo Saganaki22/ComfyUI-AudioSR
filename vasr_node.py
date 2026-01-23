@@ -500,8 +500,8 @@ class VASRNode:
                 f"Model not found. Please download the AudioSR model and place it in:\n"
                 f"{get_vasr_model_path()}\n\n"
                 f"Download from:\n"
-                f"Basic: https://huggingface.co/haoheliu/audiosr_basic\n"
-                f"Speech: https://huggingface.co/haoheliu/audiosr_speech"
+                f"Basic: https://huggingface.co/drbaph/AudioSR/blob/main/AudioSR/audiosr_basic_fp32.safetensors\n"
+                f"Speech: https://huggingface.co/drbaph/AudioSR/blob/main/AudioSR/audiosr_speech_fp32.safetensors"
             )
 
         # Load or reuse model
