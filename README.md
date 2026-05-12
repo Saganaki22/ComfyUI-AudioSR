@@ -156,7 +156,7 @@ pip install -r requirements.txt
 cd ComfyUI/custom_nodes
 git clone https://github.com/Saganaki22/ComfyUI-AudioSR
 cd ComfyUI-AudioSR
-..\python_embeded\python.exe -s -m pip install -r requirements.txt
+..\..\..\python_embeded\python.exe -s -m pip install -r requirements.txt
 ```
 
 ### 📥 Download Models
