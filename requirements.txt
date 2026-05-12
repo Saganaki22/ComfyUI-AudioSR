@@ -28,6 +28,7 @@ pyyaml
 progressbar2
 tqdm
 ftfy
+pandas
 
 # Text processing
 unidecode
