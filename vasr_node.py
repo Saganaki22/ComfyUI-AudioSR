@@ -333,10 +333,10 @@ class VASRNode:
                 pass  # Directory doesn't exist yet
 
             # Add default option if no models found
-            if not model_files:
+            if model_files:
+                _model_files_cache = model_files
+            else:
                 model_files = ["basic (download required)", "speech (download required)"]
-
-            _model_files_cache = model_files
 
         return {
             "required": {
