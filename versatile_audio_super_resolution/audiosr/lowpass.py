@@ -6,7 +6,44 @@ import numpy as np
 
 from scipy.signal import sosfiltfilt
 from scipy.signal import butter, cheby1, cheby2, ellip, bessel
-from scipy.signal import resample_poly
+
+
+def _safe_resample(data: np.ndarray, target_length: int) -> np.ndarray:
+    """Resample ``data`` to ``target_length`` using scipy's FFT-based path.
+
+    We deliberately avoid :func:`scipy.signal.resample_poly` here because, on
+    Python 3.13+ / newer scipy, ``resample_poly`` internally calls
+    :func:`array_api_compat.common._helpers.is_array_api_obj`, which iterates
+    over a list of registered array-API libraries (numpy, torch, cupy, jax,
+    dask, …) and does ``getattr(mod, "Array")`` on each. If a library is
+    partially registered in ``sys.modules`` (e.g. ``mod is None`` — common in
+    ComfyUI bundles that import a stub jax shim), that ``getattr`` raises
+    ``AttributeError: 'NoneType' object has no attribute 'Array'``.
+
+    The FFT path in :func:`scipy.signal.resample` is functionally equivalent
+    for the "downsample to a low sampling rate, then upsample to the original
+    rate" pattern used in :func:`stft_hard_lowpass` (an ideal lowpass via
+    periodic extension), and it does not touch the array-API dispatch layer.
+
+    Args:
+        data: 1-D numpy array of samples to resample.
+        target_length: Desired output length in samples (>= 1).
+
+    Returns:
+        1-D numpy array of length ``target_length``.
+
+    Raises:
+        ValueError: If ``data`` is not 1-D or ``target_length`` < 1.
+    """
+    if data.ndim != 1:
+        raise ValueError(
+            f"_safe_resample expects a 1-D array, got shape {data.shape!r}"
+        )
+    if target_length < 1:
+        raise ValueError(
+            f"_safe_resample target_length must be >= 1, got {target_length}"
+        )
+    return signal.resample(data, target_length)
 
 
 def align_length(x=None, y=None, Lx=None):
@@ -121,13 +158,42 @@ def lowpass_filter(x, highcut, fs, order, ftype):
     return y
 
 
-def stft_hard_lowpass(data, lowpass_ratio, fs_ori=44100):
-    fs_down = int(lowpass_ratio * fs_ori)
-    # downsample to the low sampling rate
-    y = resample_poly(data, fs_down, fs_ori)
+def stft_hard_lowpass(data: np.ndarray, lowpass_ratio: float, fs_ori: int = 44100) -> np.ndarray:
+    """Hard lowpass via downsample→upsample (ideal lowpass / periodic extension).
 
-    # upsample to the original sampling rate
-    y = resample_poly(y, fs_ori, fs_down)
+    Replaces the previous ``resample_poly``-based implementation to avoid
+    ``AttributeError: 'NoneType' object has no attribute 'Array'`` raised by
+    ``scipy.signal.resample_poly``'s internal ``array_api_compat`` dispatch
+    on Python 3.13+ when a partially-registered array-API library (e.g. jax)
+    is in ``sys.modules`` as ``None``. See :func:`_safe_resample` for details.
+
+    Args:
+        data: 1-D numpy array of input samples.
+        lowpass_ratio: Ratio of the target low sampling rate to ``fs_ori``
+            (e.g. ``0.1`` for 4.41 kHz down from 44.1 kHz).
+        fs_ori: Original sampling rate in Hz. Default 44100.
+
+    Returns:
+        1-D numpy array of the same length as ``data`` containing the
+        lowpass-filtered signal.
+    """
+    if data.ndim != 1:
+        raise ValueError(
+            f"stft_hard_lowpass expects a 1-D array, got shape {data.shape!r}"
+        )
+    if not (0.0 < lowpass_ratio <= 1.0):
+        raise ValueError(
+            f"lowpass_ratio must be in (0, 1], got {lowpass_ratio!r}"
+        )
+
+    fs_down = int(lowpass_ratio * fs_ori)
+    n_down = max(1, int(round(len(data) * fs_down / fs_ori)))
+
+    # Downsample to the low sampling rate, then upsample back to the original
+    # length. Both hops go through scipy.signal.resample (FFT path) instead of
+    # resample_poly, so the array_api_compat dispatch layer is never reached.
+    y = _safe_resample(data, n_down)
+    y = _safe_resample(y, len(data))
 
     if len(y) != len(data):
         y = align_length(data, y)
